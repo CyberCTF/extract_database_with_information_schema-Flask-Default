@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="flex flex-col items-center justify-center min-h-screen">
+    <div class="max-w-xl w-full">
+        {% if error %}
+        <div class="bg-red-900 bg-opacity-80 text-red-200 rounded-lg p-4 mb-6 shadow-lg border border-red-700">
+            <strong>Error:</strong> {{ error }}
+        </div>
+        {% endif %}
+        {% if product %}
+        <div class="bg-gray-900 bg-opacity-80 rounded-2xl shadow-xl p-8 card border border-gray-800">
+            <h1 class="text-3xl font-bold text-white mb-4">{{ product[1] }}</h1>
+            <div class="text-lg text-gray-300 mb-2">{{ product[2] }}</div>
+            <div class="text-2xl text-blue-400 font-bold mb-6">${{ '%.2f'|format(product[3]) }}</div>
+            <a href="/lab" class="btn-primary px-6 py-2 rounded-lg text-white font-semibold shadow hover:scale-105 transition-all">Back to Catalog</a>
+        </div>
+        {% else %}
+        <div class="bg-gray-800 bg-opacity-80 rounded-lg p-6 text-gray-300 text-center shadow-lg border border-gray-700">
+            Product not found.
+            <div class="mt-4">
+                <a href="/lab" class="btn-primary px-6 py-2 rounded-lg text-white font-semibold shadow hover:scale-105 transition-all">Back to Catalog</a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

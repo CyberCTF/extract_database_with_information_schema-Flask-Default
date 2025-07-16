@@ -10,4 +10,22 @@ services:
       - ../deploy:/app/../deploy:ro
     environment:
       - FLASK_ENV=production
-    restart: unless-stopped 
+      - DB_HOST=db
+      - DB_USER=appuser
+      - DB_PASSWORD=apppass
+      - DB_NAME=shopdb
+    depends_on:
+      - db
+    restart: unless-stopped
+  db:
+    image: mysql:5.7
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: shopdb
+      MYSQL_USER: appuser
+      MYSQL_PASSWORD: apppass
+    ports:
+      - "3306:3306"
+    volumes:
+      - ../deploy/init.sql:/docker-entrypoint-initdb.d/init.sql:ro 

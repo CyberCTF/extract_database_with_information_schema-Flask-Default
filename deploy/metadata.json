@@ -7,7 +7,8 @@
   },
   "navigation": {
     "main": [
-      { "link": "/", "title": "Home" }
+      { "link": "/", "title": "Home" },
+      { "link": "/lab", "title": "Product Catalog" }
     ],
     "auth": [
       { "link": "/login", "title": "Login" },

@@ -1,0 +1,75 @@
+{
+  "mission_context": {
+    "fictional_company_environment": "Acme Widgets, Inc., a mid-sized e-commerce platform hosting several online shops, uses a web portal powered by PHP and MySQL. The development team followed incomplete input validation practices.",
+    "technical_setup_and_constraints": "The site uses PHP 7.x and MySQL 5.7. User-supplied input is concatenated directly into SQL queries, making it vulnerable to SQL injection. The output is rendered within HTML tables. Some fields are sanitzed, but numeric input like the product 'id' is not.",
+    "discovery_context": "During a blackbox pentest, product pages showed inconsistent numbers of rows returned when manually tweaking the 'id' parameter. An initial test using a single quote led to SQL errors, suggesting a classic injection flaw."
+  },
+  "element_to_proof": "List of all database names extracted via union-based SQLi from information_schema.schemata",
+  "walkthrough": {
+    "title": "Enumerating Databases in a Vulnerable Online Shop via UNION-based SQL Injection",
+    "steps": [
+      {
+        "question": "How can you verify if the 'id' parameter on the product page is vulnerable to SQL injection?",
+        "hint": "Try injecting a single quote (') and observe for SQL errors in the response.",
+        "solution": "Access /product.php?id=1' and check if a SQL syntax error or similar message is displayed."
+      },
+      {
+        "question": "What is your next step to determine the number of columns in the original SQL query for UNION injection?",
+        "hint": "Use 'ORDER BY' to incrementally check the maximum number of columns.",
+        "solution": "Inject /product.php?id=1 ORDER BY 1-- , then 2--, 3--, etc., until you get an error—this reveals the column count."
+      },
+      {
+        "question": "Once you know the column count, how do you verify which columns are rendered on the page?",
+        "hint": "Inject with UNION SELECT and distinguishable numbers or strings.",
+        "solution": "Use /product.php?id=1 UNION SELECT 1,2-- (or as many columns as found from previous step), and check which numbers appear in the response HTML."
+      },
+      {
+        "question": "How do you construct a UNION-based SQL injection payload to extract database names from information_schema.schemata?",
+        "hint": "Replace a visible column with 'schema_name' from information_schema.schemata in your UNION SELECT.",
+        "solution": "For two columns, use /product.php?id=1 UNION SELECT NULL, schema_name FROM information_schema.schemata--. Adjust placement so 'schema_name' is in a visible column."
+      },
+      {
+        "question": "How do you maximize extraction of all database names if limited output space is available?",
+        "hint": "Automate or paginate your requests to cycle through databases.",
+        "solution": "Iterate 'LIMIT x,1' on the end of your injection, e.g., /product.php?id=1 UNION SELECT NULL, schema_name FROM information_schema.schemata LIMIT 0,1--, then 1,1, 2,1, etc."
+      }
+    ],
+    "final_flag_info": "Full list of available MySQL database names from the target via information_schema.schemata"
+  },
+  "lab_readme": {
+    "title": "CTF Lab: Extract Database Names via Union-Based SQL Injection in MySQL",
+    "description": "In this lab, you'll exploit a classic union-based SQL injection vulnerability in a simulated e-commerce PHP webapp to enumerate the underlying MySQL database names using information_schema.",
+    "objectives": [
+      "Detect and exploit SQL injection in numeric input.",
+      "Enumerate original query column count and columns echoed in output.",
+      "Craft UNION-based SQLi payloads using information_schema.schemata.",
+      "Enumerate all database names and submit them as the challenge flag."
+    ],
+    "difficulty": "Intermediate",
+    "estimated_time": "30-45 minutes",
+    "prerequisites": [
+      "Basic SQL and SQL injection knowledge",
+      "Familiarity with HTTP requests and web proxies",
+      "Basic Linux command line",
+      "Burp Suite or similar proxy (optional: sqlmap familiarization)"
+    ],
+    "skills_learned": [
+      "Information_schema enumeration",
+      "Manual SQL injection exploitation",
+      "Identifying injectable parameters",
+      "Paginating UNION SELECT injection outputs"
+    ],
+    "project_structure": [
+      "folder:src",
+      "folder:docker",
+      "folder:docs",
+      "file:README.md",
+      "file:.gitignore"
+    ],
+    "quick_start": {
+      "prerequisites": "Docker and Docker Compose installed.",
+      "installation": "Clone the repository. Run `docker-compose up --build` in the lab root directory. Access the vulnerable webapp at http://localhost:8080."
+    },
+    "issue_tracker_url": "https://github.com/Cyber-Library/issues"
+  }
+}
