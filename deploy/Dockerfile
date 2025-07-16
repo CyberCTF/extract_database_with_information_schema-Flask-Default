@@ -1,6 +1,6 @@
 FROM python:3.11-slim
 WORKDIR /app
-RUN apt-get update && apt-get install -y default-libmysqlclient-dev gcc && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y libmysqlclient-dev gcc && rm -rf /var/lib/apt/lists/*
 COPY build/requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 COPY build/ ./
